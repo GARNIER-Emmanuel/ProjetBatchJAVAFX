@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.manu.batchrunner.controllers.MainViewController">
+        
+    <!-- Left panel -->
+    <left>
+        <VBox spacing="10" padding="10.0, 10.0, 10.0, 10.0">
+            <TextField fx:id="searchField" promptText="Rechercher un batch..." />
+            <ListView fx:id="batchListView" prefWidth="200" />
+            <Button fx:id="runBatchButton" text="Lancer le batch" />
+        </VBox>
+    </left>
+
+    <!-- Center panel -->
+    <center>
+        <StackPane fx:id="centerPane" style="-fx-background-color: #f0f0f0;" />
+    </center>
+
+    <!-- Right panel -->
+    <right>
+        <TextArea fx:id="logTextArea" editable="false" wrapText="true" prefWidth="300" />
+    </right>
+</BorderPane>
