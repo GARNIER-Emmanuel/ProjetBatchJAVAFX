@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.manu.batchrunner.controllers.BatchController"
+      fx:id="rootVBox"
+      spacing="15"
+      minWidth="100">
+
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- Barre de recherche de batchs -->
+    <TextField fx:id="searchField" promptText="🔍 Rechercher un batch..." />
+
+    <!-- Liste des batchs -->
+    <ListView fx:id="batchListView" prefWidth="220" prefHeight="300" />
+
+    <!-- Barre de recherche dans le contenu d'un batch -->
+    <HBox spacing="5">
+        <TextField fx:id="searchKeywordField" promptText="🔎 Rechercher dans le contenu..." HBox.hgrow="ALWAYS"/>
+        <Button text="🔍 Rechercher" onAction="#searchInFlux"/>
+    </HBox>
+
+    <!-- Zone d'affichage du contenu du batch -->
+    <TextArea fx:id="batchTextArea" prefHeight="250" wrapText="true" VBox.vgrow="ALWAYS"/>
+
+    <!-- Section : Actions Batch -->
+    <VBox spacing="5">
+        <Button fx:id="runBatchButton" text="▶ Lancer le batch" maxWidth="Infinity" onAction="#runBatchButtonClicked" />
+    </VBox>
+
+    <!-- Édition et sauvegarde -->
+    <HBox spacing="10">
+        <Button fx:id="editInternallyButton" text="✏ Editer en interne" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#editInternallyButtonClicked" />
+        <Button fx:id="saveBatchButton" text="💾 Enregistrer modifications" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#saveBatchButtonClicked" />
+    </HBox>
+
+    <!-- Création de batch -->
+    <HBox spacing="10">
+        <Button fx:id="editBatchButton" text="✏ Modifier dans Notepad++" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#editBatchButtonClicked" />
+        <Button fx:id="createBatchButton" text="➕ Créer batch" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#createBatchButtonClicked" />
+    </HBox>
+
+    <!-- Changement de dossier -->
+    <Button fx:id="changeBatchFolderButton" text="📂 Changer dossier batches" maxWidth="Infinity" onAction="#changeBatchFolderButtonClicked" />
+
+</VBox>

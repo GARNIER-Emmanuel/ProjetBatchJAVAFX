@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<SplitPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           orientation="HORIZONTAL"
+           dividerPositions="0.25, 0.75"
+           fx:controller="com.manu.batchrunner.controllers.MainViewController">
+
+    <items>
+        <fx:include fx:id="leftInclude" source="/views/left_view.fxml" />
+        <fx:include fx:id="centerInclude" source="/views/center_view.fxml" />
+        <fx:include fx:id="rightInclude" source="/views/right_view.fxml" />
+    </items>
+</SplitPane>
+

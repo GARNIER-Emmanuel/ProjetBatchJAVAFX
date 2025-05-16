@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox fx:controller="com.manu.batchrunner.controllers.FluxController"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="rootVBox"
+      prefWidth="350"
+      minWidth="180"
+      spacing="10"
+      VBox.vgrow="ALWAYS">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <TabPane fx:id="tabPaneRoot" VBox.vgrow="ALWAYS">
+
+        <tabs>
+
+            <Tab text="Batch Logs" closable="false">
+                <content>
+                    <VBox spacing="10"  VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+
+                        <TextArea fx:id="logTextArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+                        <Button text="Nettoyer les logs" onAction="#clearLogs" maxWidth="Infinity"/>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <Tab text="Flux XML" closable="false">
+                <content>
+                    <VBox spacing="10" VBox.vgrow="ALWAYS">
+
+                        <TextField fx:id="searchFluxField" promptText="🔍 Rechercher un flux..." />
+
+                        <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS">
+
+                            <ListView fx:id="fluxListView" />
+
+                            <TextArea fx:id="fluxTextArea" wrapText="true" />
+
+                        </SplitPane>
+
+                        <HBox spacing="5">
+                            <TextField fx:id="searchKeywordField" promptText="🔍 Rechercher dans le flux..." HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="searchFluxButton" text="🔍 Rechercher" onAction="#searchInFlux"/>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Button fx:id="editInternallyButton" text="📝 Éditer en interne" onAction="#editInternallyButtonClicked" maxWidth="Infinity">
+                                <HBox.hgrow>
+                                    <Priority fx:constant="ALWAYS"/>
+                                </HBox.hgrow>
+                            </Button>
+                            <Button fx:id="saveFlux" text="💾 Enregistrer" onAction="#saveFluxButtonClicked" maxWidth="Infinity">
+                                <HBox.hgrow>
+                                    <Priority fx:constant="ALWAYS"/>
+                                </HBox.hgrow>
+                            </Button>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Button fx:id="editInNotePad" text="✏ Éditer dans Notepad++" onAction="#editFluxButtonClicked" maxWidth="Infinity">
+                                <HBox.hgrow>
+                                    <Priority fx:constant="ALWAYS"/>
+                                </HBox.hgrow>
+                            </Button>
+                            <Button fx:id="createFluxButton" text="➕ Créer un flux" onAction="#createFluxButtonClicked" maxWidth="Infinity">
+                                <HBox.hgrow>
+                                    <Priority fx:constant="ALWAYS"/>
+                                </HBox.hgrow>
+                            </Button>
+                        </HBox>
+
+                        <Button fx:id="changeFluxFolderButton" text="📁 Changer le dossier flux XML" onAction="#openFluxFolderDialog" maxWidth="Infinity"/>
+
+                    </VBox>
+                </content>
+            </Tab>
+
+        </tabs>
+    </TabPane>
+
+</VBox>

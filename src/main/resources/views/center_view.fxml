@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.manu.batchrunner.controllers.PdfController"
+            fitToWidth="true" fitToHeight="true"
+            fx:id="pdfScrollPane">
+
+    <HBox spacing="10" alignment="CENTER">
+    <Button text="Zoom In" onAction="#zoomIn"/>
+    <Button text="Zoom Out" onAction="#zoomOut"/>
+    </HBox>
+
+    <ScrollPane fx:id="pdfScrollPane" fitToWidth="true">
+        <content>
+            <VBox fx:id="pdfPagesContainer" spacing="10" />
+        </content>
+    </ScrollPane>
+
+
+</ScrollPane>

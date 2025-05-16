@@ -1,2 +1,7 @@
 com\manu\batchrunner\App.class
+com\manu\batchrunner\controllers\BatchController.class
+com\manu\batchrunner\controllers\PdfController.class
 com\manu\batchrunner\controllers\MainViewController.class
+com\manu\batchrunner\controllers\LogController.class
+com\manu\batchrunner\controllers\FluxController.class
+com\manu\batchrunner\utils\FileUtils.class
