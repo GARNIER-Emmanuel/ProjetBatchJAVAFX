@@ -17,6 +17,8 @@ public class App extends Application {
         primaryStage.setTitle("Batch Runner");
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setMaximized(true);
+
     }
 
     public static void main(String[] args) {

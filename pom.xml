@@ -10,25 +10,34 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <javafx.version>20</javafx.version>
+        <javafx.version>17.0.7</javafx.version>
     </properties>
 
     <dependencies>
-        <!-- JavaFX modules -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.1</version> 
+            <version>17.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>17.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
+            <version>17.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>17.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.30</version>
         </dependency>
     </dependencies>
 
@@ -40,8 +49,23 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.manu.batchrunner.App</mainClass>
+                    <modulePaths>
+                        <modulePath>${project.basedir}/target/classes</modulePath>
+                    </modulePaths>
+                    <launcher>FXLauncher</launcher>
+                    <jvmArgs>
+                        --add-modules javafx.controls,javafx.fxml,javafx.web,javafx.swing
+                    </jvmArgs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
 </project>

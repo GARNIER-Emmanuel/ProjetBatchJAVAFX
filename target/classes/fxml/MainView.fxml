@@ -2,6 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.BorderPane?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -9,20 +12,83 @@
         
     <!-- Left panel -->
     <left>
-        <VBox spacing="10" padding="10.0, 10.0, 10.0, 10.0">
+        <VBox spacing="15">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
             <TextField fx:id="searchField" promptText="Rechercher un batch..." />
-            <ListView fx:id="batchListView" prefWidth="200" />
-            <Button fx:id="runBatchButton" text="Lancer le batch" />
+            
+            <ListView fx:id="batchListView" prefWidth="220" prefHeight="300" />
+            
+            <VBox spacing="8">
+                <Label text="Actions batch" style="-fx-font-weight: bold;"/>
+                <Button fx:id="runBatchButton" text="▶ Lancer le batch" maxWidth="180" />
+            </VBox>
+            
+            <VBox spacing="8">
+                <Label text="Édition" style="-fx-font-weight: bold;" />
+                <Button fx:id="editBatchButton" text="✏ Modifier dans Notepad++" maxWidth="180" />
+                <Button fx:id="editInternallyButton" text="✏ Editer en interne" maxWidth="180" />
+                <Button fx:id="saveBatchButton" text="💾 Enregistrer modifications" maxWidth="180" />
+            </VBox>
+            
+            <VBox spacing="8">
+                <Label text="Gestion fichiers" style="-fx-font-weight: bold;" />
+                <Button fx:id="createBatchButton" text="➕ Créer batch" maxWidth="180" />
+                <Button fx:id="changeBatchFolderButton" text="📂 Changer dossier batches" maxWidth="180" />
+            </VBox>
         </VBox>
     </left>
 
+
     <!-- Center panel -->
     <center>
-        <StackPane fx:id="centerPane" style="-fx-background-color: #f0f0f0;" />
+        <ScrollPane fx:id="pdfScrollPane" fitToWidth="true" prefWidth="800" prefHeight="600">
+            <content>
+                <VBox fx:id="pdfPagesContainer" spacing="10" alignment="TOP_CENTER" />
+            </content>
+        </ScrollPane>
     </center>
+
 
     <!-- Right panel -->
     <right>
-        <TextArea fx:id="logTextArea" editable="false" wrapText="true" prefWidth="300" />
+        <TabPane prefWidth="350">
+
+            <Tab text="Batch Logs" closable="false">
+                <VBox spacing="5">
+                
+                <!-- Tu peux garder la TextArea pour édition et logs en dessous -->
+                <TextArea fx:id="fluxEditArea" prefHeight="200" wrapText="true" />
+
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                    <TextArea fx:id="logTextArea" editable="false" wrapText="true" prefHeight="400"/>
+                    <!-- Boutons Batch ici si besoin -->
+                </VBox>
+            </Tab>
+
+            <Tab text="Flux XML" closable="false">
+                <VBox spacing="5">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <TextField fx:id="searchFluxField" promptText="Rechercher un flux..." />
+                <ListView fx:id="fluxListView" prefHeight="150" />
+                <Button fx:id="openFluxNotepadButton" text="Ouvrir flux dans Notepad++" />
+                    <ListView fx:id="fluxListViewXML" prefHeight="150" />
+                    <TextArea fx:id="fluxTextArea" wrapText="true" editable="false" prefHeight="250"/>
+                    <HBox spacing="5">
+                        <Button fx:id="editFluxButton" text="Editer" />
+                        <Button fx:id="saveFluxButton" text="Enregistrer" />
+                        <Button fx:id="createFluxButton" text="Créer" />
+                        <Button fx:id="changeFluxFolderButton" text="Changer dossier flux XML" />
+                    </HBox>
+                </VBox>
+            </Tab>
+
+        </TabPane>
     </right>
+
 </BorderPane>
