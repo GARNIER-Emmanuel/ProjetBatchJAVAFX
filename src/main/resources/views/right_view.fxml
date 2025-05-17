@@ -36,22 +36,28 @@
 
             <Tab text="Flux XML" closable="false">
                 <content>
-                    <VBox spacing="10" VBox.vgrow="ALWAYS">
-
+                    <VBox spacing="5" VBox.vgrow="ALWAYS">
+                                <padding>
+                                    <Insets top="5" bottom="5"/>
+                                </padding>
                         <TextField fx:id="searchFluxField" promptText="🔍 Rechercher un flux..." />
 
-                        <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS">
-
+                       <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS" dividerPositions="0.3">
+                            <!-- Partie haute : ListView (30%) -->
                             <ListView fx:id="fluxListView" />
 
-                            <TextArea fx:id="fluxTextArea" wrapText="true" />
-
+                            <!-- Partie basse : TextArea (70%) avec zone de recherche au-dessus -->
+                            <VBox spacing="5">
+                                <padding>
+                                    <Insets top="5" bottom="10"/>
+                                </padding>
+                                <HBox spacing="5">
+                                    <TextField fx:id="searchKeywordField" promptText="🔍 Rechercher dans le flux..." HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="searchFluxButton" text="🔍 Rechercher" onAction="#searchInFlux"/>
+                                </HBox>
+                                <TextArea fx:id="fluxTextArea" wrapText="true" VBox.vgrow="ALWAYS"/>
+                            </VBox>
                         </SplitPane>
-
-                        <HBox spacing="5">
-                            <TextField fx:id="searchKeywordField" promptText="🔍 Rechercher dans le flux..." HBox.hgrow="ALWAYS"/>
-                            <Button fx:id="searchFluxButton" text="🔍 Rechercher" onAction="#searchInFlux"/>
-                        </HBox>
 
                         <HBox spacing="10">
                             <Button fx:id="editInternallyButton" text="📝 Éditer en interne" onAction="#editInternallyButtonClicked" maxWidth="Infinity">

@@ -1,9 +1,15 @@
-.root {
-    -fx-background-color: #ffffff;
-    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+#rootCenterView {
+    -fx-background-color: #e1e8ef;
+    -fx-padding: 5;
+    -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 13px;
-    -fx-padding: 16;
 }
+
+.hbox {
+    -fx-spacing: 10;
+    -fx-alignment: center;
+}
+
 
 .zoom-button {
     -fx-background-color: #2563eb;

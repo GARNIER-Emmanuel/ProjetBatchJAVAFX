@@ -32,6 +32,7 @@ public class BatchController {
     private File currentBatchFolder;
     @FXML
     private VBox rootVBox;  // ajoute fx:id="rootVBox" dans le VBox racine du FXML
+    private int lastSearchIndex = 0;
 
     @FXML
     private Button runBatchButton;
@@ -125,6 +126,10 @@ public class BatchController {
             }
         });
 
+        searchKeywordField.textProperty().addListener((obs, oldText, newText) -> {
+            lastSearchIndex = 0;
+        });
+
     }
 
     
@@ -156,21 +161,35 @@ private void showButtonText() {
     private void searchInFlux() {
         String keyword = searchKeywordField.getText();
         String content = batchTextArea.getText();
-
-        if (keyword != null && !keyword.isEmpty()) {
-            int index = content.indexOf(keyword);
-            if (index >= 0) {
-                batchTextArea.selectRange(index, index + keyword.length());
-                batchTextArea.requestFocus();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Recherche");
-                alert.setHeaderText(null);
-                alert.setContentText("Aucune occurrence trouvée.");
-                alert.showAndWait();
-            }
+    
+        if (keyword == null || keyword.isEmpty()) {
+            return;
+        }
+    
+        // Recherche à partir de la dernière position + 1
+        int index = content.indexOf(keyword, lastSearchIndex + 1);
+    
+        // Si pas trouvé, on repart au début du texte
+        if (index == -1) {
+            index = content.indexOf(keyword);
+        }
+    
+        if (index >= 0) {
+            batchTextArea.selectRange(index, index + keyword.length());
+            batchTextArea.requestFocus();
+    
+            lastSearchIndex = index;  // Sauvegarde de la position courante
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Recherche");
+            alert.setHeaderText(null);
+            alert.setContentText("Aucune occurrence trouvée.");
+            alert.showAndWait();
+    
+            lastSearchIndex = 0; // reset si rien trouvé
         }
     }
+
     private void filterBatchList(String filter) {
         if (currentBatchFolder == null) return;
 

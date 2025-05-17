@@ -29,6 +29,9 @@
 
     <!-- Comparaison : deux scrolls côte à côte -->
     <HBox fx:id="pdfContainerHBox" spacing="10" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="5" right="10" bottom="5" left="10"/>
+        </padding>
         <ScrollPane fx:id="pdfScrollPane1" fitToWidth="true" fitToHeight="true" HBox.hgrow="ALWAYS">
             <content>
                 <VBox fx:id="pdfPagesContainer1" spacing="10" alignment="TOP_CENTER"/>
