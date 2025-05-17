@@ -147,13 +147,13 @@ public class PdfController implements Initializable {
         }
        
         
-        final double scrollSpeedFactor = 2.0; // Ajuste ce facteur pour accélérer ou ralentir
+        final double scrollSpeedFactor = 4.0; // Ajuste ce facteur pour accélérer ou ralentir
 
         activePdfPagesContainer = pdfPagesContainer1;
         if (pdfScrollPane1 != null) {
             pdfScrollPane1.addEventFilter(ScrollEvent.SCROLL, event -> {
                 double deltaY = event.getDeltaY();
-                double newValue = pdfScrollPane1.getVvalue() - scrollSpeedFactor * deltaY / pdfPagesContainer2.getHeight();
+                double newValue = pdfScrollPane1.getVvalue() - scrollSpeedFactor * deltaY / pdfPagesContainer1.getHeight();
                 pdfScrollPane1.setVvalue(clamp(newValue, 0, 1));
             });
         }
@@ -161,7 +161,7 @@ public class PdfController implements Initializable {
         if (pdfScrollPane2 != null) {
             pdfScrollPane2.addEventFilter(ScrollEvent.SCROLL, event -> {
                 double deltaY = event.getDeltaY();
-                double newValue = pdfScrollPane2.getVvalue() - scrollSpeedFactor * deltaY / pdfPagesContainer1.getHeight();
+                double newValue = pdfScrollPane2.getVvalue() - scrollSpeedFactor * deltaY / pdfPagesContainer2.getHeight();
                 pdfScrollPane2.setVvalue(clamp(newValue, 0, 1));
             });
         }
