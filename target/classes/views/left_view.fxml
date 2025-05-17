@@ -6,6 +6,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      stylesheets="@styles/left_view_style.css"
       fx:controller="com.manu.batchrunner.controllers.BatchController"
       fx:id="rootVBox"
       spacing="15"

@@ -1,0 +1,41 @@
+#rootVBox {
+    -fx-background-color: #e6f1e6; /* vert très clair */
+    -fx-padding: 12;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #3a6b3a;
+}
+
+.text-field {
+    -fx-background-color: #d9ead9;
+    -fx-text-fill: #3a6b3a;
+    -fx-prompt-text-fill: #a8c1a8;
+    -fx-border-color: #a1c4a1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 6 8 6 8;
+}
+
+.list-view {
+    -fx-background-color: #d9ead9;
+    -fx-border-color: #a1c4a1;
+    -fx-border-radius: 5;
+    -fx-text-fill: #3a6b3a;
+}
+
+.button {
+    -fx-background-color: #a1c4a1;
+    -fx-text-fill: #234923;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12;
+    -fx-border-color: #8cae8c;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #88b688;
+    -fx-text-fill: white;
+}

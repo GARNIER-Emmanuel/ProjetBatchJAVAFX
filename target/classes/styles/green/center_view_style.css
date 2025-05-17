@@ -1,0 +1,40 @@
+#rootCenterView {
+    -fx-background-color: #e6f1e6;
+    -fx-padding: 15;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #3a6b3a;
+}
+
+.hbox {
+    -fx-spacing: 10;
+    -fx-alignment: center;
+}
+
+.button.zoom-button {
+    -fx-background-color: #a1c4a1;
+    -fx-text-fill: #234923;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 6 10;
+    -fx-border-color: #88b688;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+.button.zoom-button:hover {
+    -fx-background-color: #88b688;
+    -fx-text-fill: white;
+}
+
+.scroll-pane {
+    -fx-background-color: #d9ead9;
+    -fx-border-color: #a1c4a1;
+    -fx-border-radius: 5;
+}
+
+#pdfPagesContainer {
+    -fx-background-color: transparent;
+    -fx-spacing: 10;
+}

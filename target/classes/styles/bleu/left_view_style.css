@@ -1,0 +1,49 @@
+/* Fond bleu pastel doux et coins arrondis */
+#rootVBox {
+    -fx-background-color: #E6F0FA;  /* bleu très clair, doux */
+    -fx-padding: 15;
+    -fx-spacing: 15;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);
+}
+
+/* Style boutons */
+.button {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+}
+
+.button:hover {
+    -fx-background-color: #357ABD;
+}
+
+/* Champs texte */
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #B0C4DE;
+    -fx-border-radius: 10;
+    -fx-padding: 6 10 6 10;
+}
+
+/* Liste */
+.list-view {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #B0C4DE;
+}
+
+/* HBox contenant boutons : espacement plus grand */
+.hbox {
+    -fx-spacing: 10;
+}
+
+/* Sélection douce */
+.text-area .content, .text-field .content, .list-cell {
+    -fx-highlight-fill: rgba(0,0,0,0.1); /* couleur douce et très légère */
+    -fx-highlight-text-fill: black;
+}

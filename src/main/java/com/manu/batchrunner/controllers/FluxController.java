@@ -15,6 +15,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
@@ -79,6 +80,7 @@ public class FluxController {
     private void createFluxButtonClicked() {
         createNewFlux();
     }
+    private String currentTheme = "default"; // ou "bleu", "green", etc.
 
     @FXML
     private void saveFluxButtonClicked() {
@@ -106,7 +108,14 @@ public class FluxController {
 
     @FXML
     private void initialize() {
-
+        String cssPath = "/styles/" + currentTheme + "/right_view_style.css";
+        URL cssURL = getClass().getResource(cssPath);
+        if (cssURL != null) {
+            rootVBox.getStylesheets().add(cssURL.toExternalForm());
+        } else {
+            System.err.println("Fichier CSS introuvable : " + cssPath);
+        }
+    
         // écouteur sur la largeur du VBox racine
         rootVBox.widthProperty().addListener((obs, oldVal, newVal) -> {
             double width = newVal.doubleValue();

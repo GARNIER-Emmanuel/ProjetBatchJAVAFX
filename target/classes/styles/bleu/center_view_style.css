@@ -1,0 +1,54 @@
+/* Styles pour le VBox rootCenterView */
+#rootCenterView {
+    -fx-background-color: #f0f4ff; /* bleu très clair, doux pour les yeux */
+    -fx-padding: 15;
+    -fx-background-radius: 15; /* arrondi doux */
+    -fx-border-radius: 15;
+    -fx-border-color: #c3d0ff;
+    -fx-border-width: 1;
+}
+
+/* HBox contenant les boutons de zoom */
+#rootCenterView > HBox {
+    -fx-background-color: #d9e2ff; /* fond bleu clair */
+    -fx-background-radius: 10;
+    -fx-padding: 5 10;
+    -fx-spacing: 10; /* espacement entre boutons */
+}
+
+/* Boutons de zoom */
+.button.zoom-button {
+    -fx-background-color: #4A90E2;  /* bleu vif */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 6 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);
+    -fx-border-color: transparent;
+    -fx-min-width: 40px;
+}
+
+/* Effet au hover */
+.button.zoom-button:hover {
+    -fx-background-color: #357ABD;
+    -fx-text-fill: white;
+}
+
+/* ScrollPane */
+#pdfScrollPane {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: #c3d0ff;
+    -fx-border-width: 1;
+}
+.button.zoom-button {
+    -fx-min-width: 30px;       /* largeur minimum plus petite */
+    -fx-padding: 3 8;          /* moins de padding vertical et horizontal */
+    -fx-font-size: 14px;       /* texte plus petit */
+    /* les autres propriétés restent identiques */
+}

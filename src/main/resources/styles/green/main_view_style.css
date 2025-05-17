@@ -1,0 +1,44 @@
+.root {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 0; /* enlever le padding pour prendre tout l’espace */
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-pref-width: 100%;   /* largeur 100% */
+    -fx-pref-height: 100%;  /* hauteur 100% */
+}
+
+/* Optionnel : si ta BorderPane est la racine */
+.border-pane {
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+}
+
+/* Barre de menu */
+.menu-bar {
+    -fx-background-color: #c7e6c7;
+    -fx-border-color: #a1c4a1;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Menu principal */
+.menu {
+    -fx-text-fill: #3a6b3a;
+    -fx-font-weight: 600;
+    -fx-padding: 5 10 5 10;
+}
+
+.menu:hover {
+    -fx-background-color: #a1c4a1;
+    -fx-text-fill: #234923;
+}
+
+.menu-item {
+    -fx-background-color: #e5f0e5;
+    -fx-text-fill: #4a7a4a;
+    -fx-padding: 5 20 5 20;
+}
+
+.menu-item:hover {
+    -fx-background-color: #a1c4a1;
+    -fx-text-fill: #234923;
+}

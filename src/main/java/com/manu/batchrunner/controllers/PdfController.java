@@ -76,6 +76,7 @@ public class PdfController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         String cheminPdf = "C:/Users/manub/OneDrive/Desktop/pdf/mamie.pdf";
         afficherPdf(cheminPdf);
 

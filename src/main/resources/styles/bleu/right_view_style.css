@@ -1,0 +1,62 @@
+/* Fond bleu doux avec coins arrondis */
+#rootVBox {
+    -fx-background-color: linear-gradient(to bottom, #e0f0ff, #c0e0ff);
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+    -fx-border-radius: 12;
+    -fx-border-color: #a0c4ff;
+    -fx-border-width: 1;
+}
+
+/* Style des boutons */
+.button {
+    -fx-background-color: #5599ff;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+}
+
+.button:hover {
+    -fx-background-color: #3366cc;
+}
+
+/* Style du TabPane et des Tabs */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+
+.tab {
+    -fx-background-insets: 0;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 8 15 8 15;
+}
+
+.tab:selected {
+    -fx-background-color: #5599ff;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+
+/* Champs texte */
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #B0C4DE;
+    -fx-border-radius: 10;
+    -fx-padding: 6 10 6 10;
+}
+/* Sélection douce */
+.text-area .content, .text-field .content, .list-cell {
+    -fx-highlight-fill: rgba(0,0,0,0.1); /* couleur douce et très légère */
+    -fx-highlight-text-fill: black;
+}
+
+
+
+/* ScrollPane style (optionnel) */
+.scroll-pane {
+    -fx-background-color: transparent;
+}

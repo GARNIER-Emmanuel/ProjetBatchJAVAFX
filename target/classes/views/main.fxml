@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<SplitPane
-    xmlns="http://javafx.com/javafx"
-    xmlns:fx="http://javafx.com/fxml"
-    orientation="HORIZONTAL"
-    fx:controller="com.manu.batchrunner.controllers.MainViewController"
-    dividerPositions="0.2, 0.8">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.manu.batchrunner.controllers.MainViewController"
+            fx:id="rootBorderPane">
+    <top>
+        <MenuBar styleClass="menu-bar">
+        <!--  <Menu text="Fichier" styleClass="menu"/>
+            <Menu text="Outils" styleClass="menu"/>-->
+            <Menu text="Paramètres" styleClass="menu">
+                <Menu text="Thème" styleClass="menu">
+                    <MenuItem text="Bleu" styleClass="menu-item" onAction="#setThemeBlue"/>
+                    <MenuItem text="Green" styleClass="menu-item" onAction="#setThemeGreen"/>
+                    <MenuItem text="Pro" styleClass="menu-item" onAction="#setThemePro"/>
+                    <MenuItem text="Default" styleClass="menu-item" onAction="#setThemeDefault"/>
+                </Menu>
+            </Menu>
+        </MenuBar>
+    </top>
 
-    <items>
-        <fx:include fx:id="leftInclude" source="/views/left_view.fxml" />
-        <fx:include fx:id="centerInclude" source="/views/center_view.fxml" />
-        <fx:include fx:id="rightInclude" source="/views/right_view.fxml" />
-    </items>
-</SplitPane>
+    <center>
+        <SplitPane orientation="HORIZONTAL" dividerPositions="0.2,0.8">
+            <items>
+                <fx:include fx:id="leftInclude" source="/views/left_view.fxml"/>
+                <fx:include fx:id="centerInclude" source="/views/center_view.fxml"/>
+                <fx:include fx:id="rightInclude" source="/views/right_view.fxml"/>
+            </items>
+        </SplitPane>
+    </center>
 
+</BorderPane>

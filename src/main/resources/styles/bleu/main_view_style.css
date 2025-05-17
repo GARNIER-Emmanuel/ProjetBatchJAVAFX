@@ -1,0 +1,57 @@
+.root {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 0; /* enlever le padding pour prendre tout l’espace */
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-pref-width: 100%;   /* largeur 100% */
+    -fx-pref-height: 100%;  /* hauteur 100% */
+}
+
+/* Optionnel : si ta BorderPane est la racine */
+.border-pane {
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+}
+
+/* Barre de menu */
+.menu-bar {
+    -fx-background-color: #4A90E2;
+    -fx-background-radius: 15 15 0 0; /* coins arrondis en haut */
+    -fx-padding: 5 10 5 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);
+}
+
+/* Menu dans la barre */
+.menu {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    -fx-padding: 5 15 5 15;
+    -fx-background-radius: 10;
+}
+
+/* Hover sur les menus */
+.menu:hover {
+    -fx-background-color: #357ABD;
+    -fx-text-fill: white;
+}
+
+/* Items de menu */
+.menu-item {
+    -fx-background-color: #D9E6F8;
+    -fx-text-fill: #357ABD;
+    -fx-padding: 6 20 6 20;
+    -fx-background-radius: 8;
+}
+
+/* Hover sur les items */
+.menu-item:hover {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+}
+
+/* Focus sur menu-item (accessibilité) */
+.menu-item:focused {
+    -fx-background-color: #2E62B8;
+    -fx-text-fill: white;
+}
