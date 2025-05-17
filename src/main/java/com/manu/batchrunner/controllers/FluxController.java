@@ -313,13 +313,19 @@ public class FluxController {
 
 
      private void showAlert(String title, String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
+        Alert.AlertType type;
+        if (title.equalsIgnoreCase("Erreur")) {
+            type = Alert.AlertType.ERROR;
+        } else if (title.equalsIgnoreCase("Succès")) {
+            type = Alert.AlertType.INFORMATION;
+        } else {
+            type = Alert.AlertType.NONE;
+        }
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void loadFluxFromFolder() {
