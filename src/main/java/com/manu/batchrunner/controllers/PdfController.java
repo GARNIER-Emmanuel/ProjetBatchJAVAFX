@@ -5,10 +5,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.embed.swing.SwingFXUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -65,14 +67,21 @@ public class PdfController implements Initializable {
 
     @FXML
     private ScrollPane pdfScrollPane2;
+    @FXML
+    private Button toggleImageOverlayButton;
+    @FXML
+    private TextArea comparisonResultTextArea;
 
+    private boolean overlayMode = false;
     private File pdfFile1; // À assigner avec le PDF 1
     private File pdfFile2; // À assigner avec le PDF 2
     @FXML
     private Button changePdfFolderButton;
     private File currentPdfFolder;
     
-    private double scale = 1.0;
+    private double scale1 = 1.0;
+    private double scale2 = 1.0;
+
     private final double scaleStep = 0.1;
     private final double minScale = 0.3;
     private final double maxScale = 3.0;
@@ -196,6 +205,7 @@ public class PdfController implements Initializable {
             System.out.println("PDF 2 actif");
         });
 
+        
         rootCenterView.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.isControlDown()) {
                 double deltaY = event.getDeltaY();
@@ -207,8 +217,24 @@ public class PdfController implements Initializable {
                 event.consume();
             }
         });
-        
+
+        if (pdfFile1 != null) loadPdfToContainer(pdfFile1, pdfPagesContainer1);
+        if (pdfFile2 != null) loadPdfToContainer(pdfFile2, pdfPagesContainer2);
+
+        pdfScrollPane2.setVisible(false);
+        pdfScrollPane2.setManaged(false);
+
     }
+    private String normalizeText(String text) {
+        if (text == null) return "";
+        // Supprime les espaces en début/fin, convertit tout en minuscules, remplace retours ligne par espaces,
+        // et remplace multiples espaces par un seul espace.
+        return text.trim()
+                   .toLowerCase()
+                   .replaceAll("\\r?\\n", " ")
+                   .replaceAll("\\s+", " ");
+    }
+    
     @FXML
     private void onClickedChoicePdfCompare() {
         FileChooser fileChooser = new FileChooser();
@@ -237,92 +263,205 @@ public class PdfController implements Initializable {
     }
 
     
-    public void comparePdfText(File pdfFile1, File pdfFile2) {
-        try (PDDocument doc1 = PDDocument.load(pdfFile1);
-        PDDocument doc2 = PDDocument.load(pdfFile2)) {
+public void comparePdfText(File pdfFile1, File pdfFile2) {
+    try (PDDocument doc1 = PDDocument.load(pdfFile1);
+         PDDocument doc2 = PDDocument.load(pdfFile2)) {
 
-       int pages1 = doc1.getNumberOfPages();
-       int pages2 = doc2.getNumberOfPages();
+        int pages1 = doc1.getNumberOfPages();
+        int pages2 = doc2.getNumberOfPages();
 
-       int maxPages = Math.max(pages1, pages2);
+        int maxPages = Math.max(pages1, pages2);
 
-       PDFTextStripper stripper = new PDFTextStripper();
+        PDFTextStripper stripper = new PDFTextStripper();
 
-       boolean allIdentical = true;
+        boolean allIdentical = true;
 
-       for (int i = 1; i <= maxPages; i++) {
-           String text1 = "";
-           String text2 = "";
+        for (int i = 1; i <= maxPages; i++) {
+            String text1 = "";
+            String text2 = "";
 
-           if (i <= pages1) {
-               stripper.setStartPage(i);
-               stripper.setEndPage(i);
-               text1 = stripper.getText(doc1).trim();
-           }
+            if (i <= pages1) {
+                stripper.setStartPage(i);
+                stripper.setEndPage(i);
+                text1 = normalizeText(stripper.getText(doc1));
+            }
 
-           if (i <= pages2) {
-               stripper.setStartPage(i);
-               stripper.setEndPage(i);
-               text2 = stripper.getText(doc2).trim();
-           }
+            if (i <= pages2) {
+                stripper.setStartPage(i);
+                stripper.setEndPage(i);
+                text2 = normalizeText(stripper.getText(doc2));
+            }
 
-           if (!text1.equals(text2)) {
-               allIdentical = false;
-               LoggerService.log("Différences détectées à la page " + i + " :");
+            if (!text1.equals(text2)) {
+                allIdentical = false;
+                LoggerService.log("Différences détectées à la page " + i + " :");
 
-               // Split en lignes
-               String[] lines1 = text1.split("\\r?\\n");
-               String[] lines2 = text2.split("\\r?\\n");
+                // Split en mots ou phrases courtes pour une meilleure comparaison
+                String[] tokens1 = text1.split(" ");
+                String[] tokens2 = text2.split(" ");
 
-               int maxLines = Math.max(lines1.length, lines2.length);
+                int maxTokens = Math.max(tokens1.length, tokens2.length);
 
-               for (int lineIndex = 0; lineIndex < maxLines; lineIndex++) {
-                   String line1 = lineIndex < lines1.length ? lines1[lineIndex] : "";
-                   String line2 = lineIndex < lines2.length ? lines2[lineIndex] : "";
+                for (int idx = 0; idx < maxTokens; idx++) {
+                    String t1 = idx < tokens1.length ? tokens1[idx] : "";
+                    String t2 = idx < tokens2.length ? tokens2[idx] : "";
 
-                   if (!line1.equals(line2)) {
-                       LoggerService.log(String.format("  Ligne %d différente :", lineIndex + 1));
-                       LoggerService.log("    PDF 1 : " + line1);
-                       LoggerService.log("    PDF 2 : " + line2);
-                   }
-               }
+                    if (!t1.equals(t2)) {
+                        LoggerService.log(String.format("  Différence mot %d : '%s' vs '%s'", idx + 1, t1, t2));
+                    }
+                }
+            } else {
+                LoggerService.log("Page " + i + " identique.");
+            }
+        }
 
-           } else {
-               LoggerService.log("Page " + i + " identique.");
-           }
-       }
+        if (allIdentical) {
+            LoggerService.log("Les deux PDFs sont identiques (texte page par page).");
+        } else {
+            LoggerService.log("Les PDFs ont des différences détaillées.");
+        }
 
-       if (allIdentical) {
-           LoggerService.log("Les deux PDFs sont identiques (texte page par page).");
-       } else {
-           LoggerService.log("Les PDFs ont des différences détaillées.");
-       }
-
-   } catch (IOException e) {
-       LoggerService.log("Erreur lors de la lecture des PDFs: " + e.getMessage());
-   }
+    } catch (IOException e) {
+        LoggerService.log("Erreur lors de la lecture des PDFs: " + e.getMessage());
+    }
 }
     // Méthodes pour assigner les fichiers pdfFile1 et pdfFile2, à intégrer selon ton app
     public void setPdfFiles(File file1, File file2) {
         this.pdfFile1 = file1;
         this.pdfFile2 = file2;
     }
+
+    public boolean compareImagesPixelByPixel(BufferedImage img1, BufferedImage img2) {
+        if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) {
+            return false; // tailles différentes -> pas identiques
+        }
+    
+        int width = img1.getWidth();
+        int height = img1.getHeight();
+    
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
+                    return false; // pixel différent détecté
+                }
+            }
+        }
+        return true; // toutes les pixels sont identiques
+    }
+
+    public void comparePdfByPixels(File pdfFile1, File pdfFile2) throws IOException {
+        try (PDDocument doc1 = PDDocument.load(pdfFile1);
+             PDDocument doc2 = PDDocument.load(pdfFile2)) {
+    
+            int pages1 = doc1.getNumberOfPages();
+            int pages2 = doc2.getNumberOfPages();
+            int maxPages = Math.max(pages1, pages2);
+    
+            PDFRenderer renderer1 = new PDFRenderer(doc1);
+            PDFRenderer renderer2 = new PDFRenderer(doc2);
+    
+            boolean allPagesIdentical = true;
+    
+            for (int i = 0; i < maxPages; i++) {
+                if (i >= pages1 || i >= pages2) {
+                    System.out.println("Nombre de pages différent entre les deux PDFs.");
+                    allPagesIdentical = false;
+                    break;
+                }
+    
+                BufferedImage img1 = renderer1.renderImageWithDPI(i, 150, ImageType.RGB);
+                BufferedImage img2 = renderer2.renderImageWithDPI(i, 150, ImageType.RGB);
+    
+                boolean pageIdentique = compareImagesPixelByPixel(img1, img2);
+                if (!pageIdentique) {
+                    System.out.println("Différence détectée à la page " + (i + 1));
+                    allPagesIdentical = false;
+                } else {
+                    System.out.println("Page " + (i + 1) + " identique.");
+                }
+            }
+    
+            if (allPagesIdentical) {
+                System.out.println("Les deux PDFs sont identiques en comparant pixel par pixel.");
+            } else {
+                System.out.println("Des différences ont été trouvées entre les PDFs.");
+            }
+        }
+    }
+    
+    
     private void loadPdfFromFolder() {
         if (currentPdfFolder == null) return;
     
     }
-
+    @FXML
+    private void onToggleImageOverlay() {
+        overlayMode = !overlayMode;
+        if (overlayMode) {
+            try {
+                showImageComparison(pdfFile1, pdfFile2);
+                pdfScrollPane2.setVisible(false);
+                pdfScrollPane2.setManaged(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            loadPdfToContainer(pdfFile1, pdfPagesContainer1);
+            loadPdfToContainer(pdfFile2, pdfPagesContainer2);
+            pdfScrollPane2.setVisible(true);
+            pdfScrollPane2.setManaged(true);
+        }
+    }
+    private void showImageComparison(File pdfFile1, File pdfFile2) throws IOException {
+        if (pdfFile1 == null || pdfFile2 == null) {
+            LoggerService.log("Un des fichiers PDF est null, impossible de comparer les images.");
+            return;
+        }
+    
+        // Rendre la première page de chaque PDF en image
+        Image img1 = renderPdfPageAsImage(pdfFile1, 0);
+        Image img2 = renderPdfPageAsImage(pdfFile2, 0);
+    
+        if (img1 == null || img2 == null) {
+            LoggerService.log("Erreur de rendu d'image pour les PDFs.");
+            return;
+        }
+    
+        // ImageView pour PDF1
+        ImageView iv1 = new ImageView(img1);
+        iv1.setFitWidth(baseWidth * scale1);
+        iv1.setPreserveRatio(true);
+    
+        // ImageView pour PDF2 avec opacité (superposition)
+        ImageView iv2 = new ImageView(img2);
+        iv2.setFitWidth(baseWidth * scale2);
+        iv2.setPreserveRatio(true);
+        iv2.setOpacity(0.5); // 50% transparent pour voir les différences
+    
+        // StackPane pour superposition
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(iv1, iv2);
+    
+        // Nettoyer le container et afficher la superposition
+        pdfPagesContainer1.getChildren().clear();
+        pdfPagesContainer1.getChildren().add(stackPane);
+    }
+    
     @FXML
     private void zoomIn() {
-        if (scale + scaleStep <= maxScale) {
-            scale += scaleStep;
-            updateScale();
+        if (activePdfPagesContainer == pdfPagesContainer1) {
+            scale1 = Math.min(scale1 + scaleStep, maxScale);
+            applyZoom(pdfPagesContainer1, scale1);
+        } else if (activePdfPagesContainer == pdfPagesContainer2) {
+            scale2 = Math.min(scale2 + scaleStep, maxScale);
+            applyZoom(pdfPagesContainer2, scale2);
         }
     }
 
     @FXML
     private void onClickedComparePdf() {
         if (pdfFile1 != null && pdfFile2 != null) {
+            
             LoggerService.log("Démarrage de la comparaison des PDFs :");
             LoggerService.log("PDF 1 : " + pdfFile1.getName());
             LoggerService.log("PDF 2 : " + pdfFile2.getName());
@@ -341,25 +480,36 @@ public class PdfController implements Initializable {
     }
     
 
-    
     @FXML
     private void zoomOut() {
-        if (scale - scaleStep >= minScale) {
-            scale -= scaleStep;
-            updateScale();
+        if (activePdfPagesContainer == pdfPagesContainer1) {
+            scale1 = Math.max(scale1 - scaleStep, minScale);
+            applyZoom(pdfPagesContainer1, scale1);
+        } else if (activePdfPagesContainer == pdfPagesContainer2) {
+            scale2 = Math.max(scale2 - scaleStep, minScale);
+            applyZoom(pdfPagesContainer2, scale2);
         }
     }
 
+    private void applyZoom(VBox container, double scale) {
+        for (Node node : container.getChildren()) {
+            if (node instanceof ImageView) {
+                ImageView imageView = (ImageView) node;
+                imageView.setFitWidth(baseWidth * scale);
+            }
+        }
+    }
+    
+    
     private Image renderPdfPageAsImage(File pdfFile, int pageIndex) throws IOException {
         if (pdfFile == null || !pdfFile.exists()) {
             System.err.println("Erreur : fichier PDF est null ou introuvable.");
-            return null; // Ou une image par défaut, ou lever une exception personnalisée
+            return null;
         }
-    
         try (PDDocument document = PDDocument.load(pdfFile)) {
             PDFRenderer renderer = new PDFRenderer(document);
-            BufferedImage bImg = renderer.renderImageWithDPI(pageIndex, 150);
-            return SwingFXUtils.toFXImage(bImg, null);
+            BufferedImage bufferedImage = renderer.renderImageWithDPI(pageIndex, 150, ImageType.RGB);
+            return SwingFXUtils.toFXImage(bufferedImage, null);
         }
     }
     
@@ -369,7 +519,22 @@ public class PdfController implements Initializable {
         for (Node node : activePdfPagesContainer.getChildren()) {
             if (node instanceof ImageView) {
                 ImageView iv = (ImageView) node;
-                iv.setFitWidth((pdfScrollPane1.getWidth() - 20) * scale);
+                iv.setFitWidth((pdfScrollPane1.getWidth() - 20) * scale1);
+            }
+        }
+
+        if (pdfPagesContainer1 != null) {
+            for (Node node : pdfPagesContainer1.getChildren()) {
+                if (node instanceof ImageView) {
+                    ((ImageView) node).setFitWidth((pdfScrollPane1.getWidth() - 20) * scale1);
+                }
+            }
+        }
+        if (pdfPagesContainer2 != null) {
+            for (Node node : pdfPagesContainer2.getChildren()) {
+                if (node instanceof ImageView) {
+                    ((ImageView) node).setFitWidth((pdfScrollPane2.getWidth() - 20) * scale2);
+                }
             }
         }
     }        
@@ -391,6 +556,10 @@ public class PdfController implements Initializable {
 
     
 private void loadPdfToContainer(File pdfFile, VBox container) {
+    if (pdfFile == null || !pdfFile.exists()) {
+        LoggerService.log("Fichier PDF non trouvé pour affichage : " + (pdfFile != null ? pdfFile.getPath() : "null"));
+        return;
+    }
     try (PDDocument document = PDDocument.load(pdfFile)) {
         PDFRenderer pdfRenderer = new PDFRenderer(document);
         container.getChildren().clear();
@@ -399,15 +568,13 @@ private void loadPdfToContainer(File pdfFile, VBox container) {
             BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 150, ImageType.RGB);
             Image fxImage = SwingFXUtils.toFXImage(bim, null);
             ImageView iv = new ImageView(fxImage);
-
+            iv.setFitWidth(baseWidth * scale1);
             iv.setPreserveRatio(true);
-            iv.setFitWidth(baseWidth * scale); // adapte à l’échelle de zoom actuelle
-
             container.getChildren().add(iv);
         }
-
     } catch (IOException e) {
         e.printStackTrace();
     }
 }
+
 }
