@@ -15,7 +15,7 @@ public class MainViewController {
     private Pane leftInclude;
 
     @FXML
-    private ScrollPane centerInclude;
+    private VBox  centerInclude;
 
     @FXML
     private VBox rootVBox;

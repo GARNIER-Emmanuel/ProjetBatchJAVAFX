@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.ImageView?>
 
-<ScrollPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.manu.batchrunner.controllers.PdfController"
-            fitToWidth="true" fitToHeight="true"
-            fx:id="pdfScrollPane">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.manu.batchrunner.controllers.PdfController"
+      spacing="10"
+      fx:id="rootCenterView">
 
-    <HBox spacing="10" alignment="CENTER">
-    <Button text="Zoom In" onAction="#zoomIn"/>
-    <Button text="Zoom Out" onAction="#zoomOut"/>
+    <!-- Barre de boutons zoom -->
+    <HBox spacing="10" alignment="CENTER" prefHeight="20" minHeight="20" maxHeight="20">
+    <padding>
+        <Insets top="15" right="10" bottom="5" left="10"/>
+    </padding>
+        <Button text="➕" onAction="#zoomIn" styleClass="zoom-button"/>
+        <Button text="➖" onAction="#zoomOut" styleClass="zoom-button"/>
     </HBox>
 
-    <ScrollPane fx:id="pdfScrollPane" fitToWidth="true">
+    <!-- Zone de scroll contenant les pages du PDF -->
+    <ScrollPane fx:id="pdfScrollPane" fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS">
         <content>
-            <VBox fx:id="pdfPagesContainer" spacing="10" />
+            <VBox fx:id="pdfPagesContainer" spacing="10" alignment="TOP_CENTER"/>
         </content>
     </ScrollPane>
 
 
-</ScrollPane>
+</VBox>

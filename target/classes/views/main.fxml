@@ -5,11 +5,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<SplitPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           orientation="HORIZONTAL"
-           dividerPositions="0.25, 0.75"
-           fx:controller="com.manu.batchrunner.controllers.MainViewController">
+<SplitPane
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    orientation="HORIZONTAL"
+    fx:controller="com.manu.batchrunner.controllers.MainViewController"
+    dividerPositions="0.2, 0.8">
 
     <items>
         <fx:include fx:id="leftInclude" source="/views/left_view.fxml" />
