@@ -21,7 +21,7 @@
 
         <tabs>
 
-            <Tab text="Batch Logs" closable="false">
+            <Tab text="Logs" closable="false">
                 <content>
                     <VBox spacing="10"  VBox.vgrow="ALWAYS">
                     <padding>

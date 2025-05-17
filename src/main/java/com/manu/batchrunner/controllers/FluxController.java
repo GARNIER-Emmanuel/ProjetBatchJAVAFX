@@ -55,6 +55,7 @@ public class FluxController {
 
     @FXML
     private Button editInNotePad;
+    private int lastSearchIndex = 0;
 
     @FXML
     private Button createFluxButton;
@@ -188,27 +189,46 @@ public class FluxController {
          // Disable editing by default
          fluxListView.setEditable(false);
 
+
+         searchKeywordField.textProperty().addListener((obs, oldText, newText) -> {
+            lastSearchIndex = 0;
+        });
+        
     }
 
     @FXML
     private void searchInFlux() {
-    String keyword = searchKeywordField.getText();
-    String content = fluxTextArea.getText();
-
-    if (keyword != null && !keyword.isEmpty()) {
-        int index = content.indexOf(keyword);
+        String keyword = searchKeywordField.getText();
+        String content = fluxTextArea.getText();
+    
+        if (keyword == null || keyword.isEmpty()) {
+            return;
+        }
+    
+        // Recherche à partir de la dernière position + 1
+        int index = content.indexOf(keyword, lastSearchIndex + 1);
+    
+        // Si pas trouvé, on repart au début du texte
+        if (index == -1) {
+            index = content.indexOf(keyword);
+        }
+    
         if (index >= 0) {
             fluxTextArea.selectRange(index, index + keyword.length());
             fluxTextArea.requestFocus();
+    
+            lastSearchIndex = index;  // Sauvegarde de la position courante
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Recherche");
             alert.setHeaderText(null);
             alert.setContentText("Aucune occurrence trouvée.");
             alert.showAndWait();
+    
+            lastSearchIndex = 0; // reset si rien trouvé
         }
     }
-}
+    
     private void openSelectedFluxInNotepad() {
         File selected = fluxListView.getSelectionModel().getSelectedItem();
         if (selected == null) return;
@@ -271,7 +291,7 @@ public class FluxController {
             }
         });
 
-        // Listener pour charger le contenu du batch sélectionné
+        // Listener pour charger le contenu du flux sélectionné
         fluxListView.getSelectionModel().selectedItemProperty().addListener((obs, oldFile, newFile) -> {
             if (newFile != null) {
                 displayFluxContent(newFile);
@@ -363,7 +383,7 @@ public class FluxController {
         editInternallyButton.setText("✏ Editer en interne");
         saveFlux.setText("💾 Enregistrer modifications");
         editInNotePad .setText("✏ Modifier dans Notepad++");
-        createFluxButton.setText("➕ Créer batch");
-        changeFluxFolderButton.setText("📂 Changer dossier batches");
+        createFluxButton.setText("➕ Créer flux");
+        changeFluxFolderButton.setText("📂 Changer dossier fluxs");
     }
 }

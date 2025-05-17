@@ -8,11 +8,15 @@ import javafx.scene.control.TextArea;
 public class LoggerService {
     private static TextArea logArea;
     private static ListView<String> executedListView;
-
+    
     public static void setExecutedList(ListView<String> listView) {
         executedListView = listView;
     }
     
+    public void initialize() {
+        LoggerService.setLogArea(logArea);
+    }
+
     public static void addToExecutedList(String batchName) {
         if (executedListView != null) {
             Platform.runLater(() -> {
