@@ -16,6 +16,7 @@
 /* Barre de menu */
 .menu-bar {
     -fx-background-color: #4A90E2;
+    -fx-background-radius: 15 15 0 0; /* coins arrondis en haut */
     -fx-padding: 5 10 5 10;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);
 }

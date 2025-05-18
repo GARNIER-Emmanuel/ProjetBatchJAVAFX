@@ -8,21 +8,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
+// Removed redundant import
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.pdfbox.text.PDFTextStripper;
+// Removed redundant import
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-
+import java.util.prefs.Preferences;
 import java.io.File;
 import java.io.IOException;
 import com.manu.batchrunner.utils.LoggerService;
+import javafx.stage.DirectoryChooser;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -31,11 +37,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.prefs.Preferences;
 
 public class PdfController implements Initializable {
 
+    private File pdfFolder;
+    private List<File> pdfFiles;   // liste des fichiers PDF triés par date décroissante
+    private int currentPdfIndex = 0; // index du PDF actuellement affiché
+    private static final String PREF_KEY_LAST_PDF_FOLDER = "lastPdfFolder";
 
     private VBox activePdfPagesContainer;  // conteneur des pages affichées (pdfPagesContainer1 ou 2)
 
@@ -64,7 +78,12 @@ public class PdfController implements Initializable {
 
     @FXML
     private ScrollPane pdfScrollPane1;
-
+    @FXML
+    private Button previousPdfButton;
+    
+    @FXML
+    private Button nextPdfButton;
+    
     @FXML
     private ScrollPane pdfScrollPane2;
     @FXML
@@ -122,12 +141,17 @@ public class PdfController implements Initializable {
         
     }
 
+
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+    
+        
+        loadLastPdfFolderIfExists();
         pdfScrollPane2.setVisible(false);
         pdfScrollPane2.setManaged(false);
-    
+        pdfPagesContainer1.getChildren().clear();
+
         try {
             // Rendre la première page de chaque PDF en image
             Image img1 = renderPdfPageAsImage(pdfFile1, 0);
@@ -180,8 +204,19 @@ public class PdfController implements Initializable {
             loadPdfFromFolder();
         }
 
-        String cheminPdf = "C:/Users/manub/OneDrive/Desktop/pdf/mamie.pdf";
-        afficherPdf(cheminPdf);
+        String lastPath = loadLastPdfFolder();
+        if (lastPath != null) {
+            File folder = new File(lastPath);
+            if (folder.exists() && folder.isDirectory()) {
+                // récupère ton premier PDF par exemple :
+                File[] pdfs = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".pdf"));
+                if (pdfs != null && pdfs.length > 0) {
+                    pdfFile1 = pdfs[0];
+                    loadPdfToContainer(pdfFile1, pdfPagesContainer1);
+                }
+            }
+        }
+       
 
         rootCenterView.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.isControlDown()) {
@@ -205,7 +240,8 @@ public class PdfController implements Initializable {
             System.out.println("PDF 2 actif");
         });
 
-        
+        final Preferences prefs = Preferences.userNodeForPackage(PdfController.class);
+
         rootCenterView.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.isControlDown()) {
                 double deltaY = event.getDeltaY();
@@ -220,6 +256,7 @@ public class PdfController implements Initializable {
 
         if (pdfFile1 != null) loadPdfToContainer(pdfFile1, pdfPagesContainer1);
         if (pdfFile2 != null) loadPdfToContainer(pdfFile2, pdfPagesContainer2);
+        LoggerService.log("pdfFile1 = " + (pdfFile1 != null ? pdfFile1.getAbsolutePath() : "null"));
 
         pdfScrollPane2.setVisible(false);
         pdfScrollPane2.setManaged(false);
@@ -263,7 +300,8 @@ public class PdfController implements Initializable {
     }
 
     
-public void comparePdfText(File pdfFile1, File pdfFile2) {
+
+    public void comparePdfText(File pdfFile1, File pdfFile2) {
     try (PDDocument doc1 = PDDocument.load(pdfFile1);
          PDDocument doc2 = PDDocument.load(pdfFile2)) {
 
@@ -315,6 +353,10 @@ public void comparePdfText(File pdfFile1, File pdfFile2) {
             }
         }
 
+       
+        
+        
+        
         if (allIdentical) {
             LoggerService.log("Les deux PDFs sont identiques (texte page par page).");
         } else {
@@ -348,7 +390,262 @@ public void comparePdfText(File pdfFile1, File pdfFile2) {
         }
         return true; // toutes les pixels sont identiques
     }
+    // Assure-toi que tu as un champ Stage (ou tu peux récupérer la fenêtre via un noeud)
+    private Stage stage;
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+  // === Gestion des préférences utilisateur (dossier PDF) ===
+    private void saveLastPdfFolder(String path) {
+        Preferences prefs = Preferences.userNodeForPackage(PdfController.class);
+        prefs.put(PREF_KEY_LAST_PDF_FOLDER, path);
+    }
+
+
+    private String loadLastPdfFolder() {
+        Preferences prefs = Preferences.userNodeForPackage(PdfController.class);
+        return prefs.get("lastPdfFolder", null);
+    }
+
+  
+    @FXML
+    public void chooseFolder() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Choisir un dossier contenant des PDF");
+        
+        // Essayer de positionner au dernier dossier ouvert
+        String lastFolderPath = prefs.get(LAST_FOLDER_KEY, null);
+        if (lastFolderPath != null) {
+            File lastFolder = new File(lastFolderPath);
+            if (lastFolder.exists() && lastFolder.isDirectory()) {
+                directoryChooser.setInitialDirectory(lastFolder);
+            }
+        }
+
+        File selectedDirectory = directoryChooser.showDialog(stage);
+        if (selectedDirectory != null) {
+            // Sauvegarder le chemin dans les prefs
+            prefs.put(LAST_FOLDER_KEY, selectedDirectory.getAbsolutePath());
+
+            // Met à jour la liste pdfFiles avec tous les pdf du dossier
+            pdfFiles = Arrays.stream(selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".pdf")))
+                             .sorted(Comparator.comparing(File::getName))
+                             .collect(Collectors.toList());
+
+            if (!pdfFiles.isEmpty()) {
+                currentPdfIndex = 0;
+                pdfFile1 = pdfFiles.get(currentPdfIndex);
+                pdfFile2 = pdfFiles.get((currentPdfIndex + 1) % pdfFiles.size());
+                openPdf(pdfFile1);
+                System.out.println("Chargement du PDF : " + pdfFiles.get(currentPdfIndex).getName());
+                openPdf(pdfFiles.get(currentPdfIndex));
+            } else {
+                System.out.println("Aucun PDF dans ce dossier.");
+            }
+        }
+    }
+    
+ private Preferences prefs = Preferences.userNodeForPackage(PdfController.class);
+    private static final String LAST_FOLDER_KEY = "lastPdfFolder";
+
+    public void loadPdf(File pdfFile) {
+        try (PDDocument document = PDDocument.load(pdfFile)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+    
+            // Clear previous content before loading new pages
+            pdfPagesContainer1.getChildren().clear();
+    
+            // Loop through all pages to render and display them
+            for (int i = 0; i < document.getNumberOfPages(); i++) {
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 150); // render page i at 150 dpi
+                Image fxImage = SwingFXUtils.toFXImage(bim, null);
+    
+                ImageView imageView = new ImageView(fxImage);
+                imageView.setPreserveRatio(true);
+                imageView.setFitWidth(600); // or whatever width fits your UI
+    
+                pdfPagesContainer1.getChildren().add(imageView);
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    private void openPdf(File pdfFile) {
+        try (PDDocument document = PDDocument.load(pdfFile)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            
+            // On vide d'abord le conteneur pour afficher les pages
+            pdfPagesContainer1.getChildren().clear();
+            
+            int pageCount = document.getNumberOfPages();
+            for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                // Rendu de chaque page en image
+                BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(pageIndex, 150);
+                Image fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
+                
+                ImageView imageView = new ImageView(fxImage);
+                imageView.setPreserveRatio(true);
+                imageView.setFitWidth(600);  // ajuste largeur max
+                
+                pdfPagesContainer1.getChildren().add(imageView);
+            }
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void loadPdfFilesFromFolder(File folder) {
+        if (folder != null && folder.isDirectory()) {
+            File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".pdf"));
+            if (files != null) {
+                pdfFiles = Arrays.asList(files);
+                currentPdfIndex = 0; // commencer au premier PDF
+                if (!pdfFiles.isEmpty()) {
+                    openPdf(pdfFiles.get(currentPdfIndex));
+                }
+            }
+        }
+    }
+    
+
+    @FXML
+    private void changePdfFolder() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir un deuxième PDF à comparer");
+        File secondPdf = fileChooser.showOpenDialog(pdfScrollPane1.getScene().getWindow());
+      
+        if (secondPdf != null) {
+            this.pdfFile1 = secondPdf;  // <--- Mise à jour de pdfFile2
+            loadPdfToContainer(secondPdf, pdfPagesContainer1);
+            LoggerService.log("PDF 2 chargé : " + secondPdf.getName());
+        }
+    }
+
+    // Récupère le chemin du dernier dossier (null si pas défini)
+    private String getLastPdfFolder() {
+        Preferences prefs = Preferences.userNodeForPackage(PdfController.class);
+        return prefs.get(PREF_KEY_LAST_PDF_FOLDER, null);
+    }
+
+  // À appeler lors de l'initialisation du controller (ex: méthode initialize)
+  public void loadLastPdfFolderIfExists() {
+    String lastFolderPath = prefs.get(LAST_FOLDER_KEY, null);
+    if (lastFolderPath != null) {
+        File lastFolder = new File(lastFolderPath);
+        if (lastFolder.exists() && lastFolder.isDirectory()) {
+            // Charge les PDFs dans ce dossier
+            pdfFiles = Arrays.stream(lastFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".pdf")))
+                             .sorted(Comparator.comparing(File::getName))
+                             .collect(Collectors.toList());
+
+            if (!pdfFiles.isEmpty()) {
+                currentPdfIndex = 0;
+                System.out.println("Chargement du PDF : " + pdfFiles.get(currentPdfIndex).getName());
+                openPdf(pdfFiles.get(currentPdfIndex));
+            } else {
+                System.out.println("Aucun PDF dans le dernier dossier enregistré.");
+            }
+        }
+    }
+}
+    
+    
+    public void onChooseFolderButtonClicked() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedFolder = directoryChooser.showDialog(pdfPagesContainer1.getScene().getWindow());
+        System.out.println("Dossier sélectionné : " + (selectedFolder != null ? selectedFolder.getAbsolutePath() : "aucun"));
+        if (selectedFolder != null) {
+            saveLastPdfFolder(selectedFolder.getAbsolutePath());
+            openPdfFolder(selectedFolder);
+        }
+    }
+    
+    // Méthode que tu appelles quand un dossier est choisi par l'utilisateur
+    public void onPdfFolderChosen(File folder) {
+        saveLastPdfFolder(folder.getAbsolutePath());
+        openPdfFolder(folder);
+    }
+
+    private void openPdfFolder(File folder) {
+        loadPdfFolder(folder);
+    }
+    
+    
+    private void loadPdfFolder(File folder) {
+        System.out.println("Chargement des PDFs dans : " + folder.getAbsolutePath());
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".pdf"));
+        if (files == null || files.length == 0) {
+            System.out.println("Aucun PDF dans le dossier " + folder.getAbsolutePath());
+            return;
+        }
+        System.out.println(files.length + " fichiers PDF trouvés.");
+        
+        List<File> sortedFiles = Arrays.stream(files)
+                                      .sorted(Comparator.comparingLong(File::lastModified).reversed())
+                                      .collect(Collectors.toList());
+        pdfFiles = sortedFiles;
+        currentPdfFolder = folder;
+        currentPdfIndex = 0;
+    
+        System.out.println("Ouverture du PDF : " + pdfFiles.get(currentPdfIndex).getName());
+        openPdf(pdfFiles.get(currentPdfIndex));
+    }
+    @FXML
+    private void onNextPdfButtonClicked() {
+        if (pdfFiles == null || pdfFiles.isEmpty()) {
+            System.out.println("Pas de PDF chargé");
+            return;
+        }
+        // Si on est au dernier PDF, on revient au premier
+        if (currentPdfIndex >= pdfFiles.size() - 1) {
+            currentPdfIndex = 0;
+        } else {
+            currentPdfIndex++;
+        }
+        System.out.println("Ouverture PDF: " + pdfFiles.get(currentPdfIndex).getName());
+        openPdf(pdfFiles.get(currentPdfIndex));
+        if (currentPdfIndex < pdfFiles.size() - 1) {
+            currentPdfIndex++;
+            pdfFile1 = pdfFiles.get(currentPdfIndex);
+            pdfFile2 = pdfFiles.get((currentPdfIndex + 1) % pdfFiles.size());
+            openPdf(pdfFile1);
+        }
+        
+    }
+    
+
+    @FXML
+    private void onPreviousPdfButtonClicked() {
+        if (pdfFiles == null || pdfFiles.isEmpty()) {
+            System.out.println("Pas de PDF chargé");
+            return;
+        }
+        // Si on est au premier PDF, on revient au dernier
+        if (currentPdfIndex <= 0) {
+            currentPdfIndex = pdfFiles.size() - 1;
+        } else {
+            currentPdfIndex--;
+        }
+        System.out.println("Ouverture PDF: " + pdfFiles.get(currentPdfIndex).getName());
+        openPdf(pdfFiles.get(currentPdfIndex));
+        if (currentPdfIndex > 0) {
+            currentPdfIndex--;
+            pdfFile1 = pdfFiles.get(currentPdfIndex);
+            pdfFile2 = pdfFiles.get((currentPdfIndex + 1) % pdfFiles.size());
+            openPdf(pdfFile1);
+        }
+        
+    }
+    
+
+    
+    
     public void comparePdfByPixels(File pdfFile1, File pdfFile2) throws IOException {
         try (PDDocument doc1 = PDDocument.load(pdfFile1);
              PDDocument doc2 = PDDocument.load(pdfFile2)) {
@@ -391,13 +688,18 @@ public void comparePdfText(File pdfFile1, File pdfFile2) {
     
     
     private void loadPdfFromFolder() {
-        if (currentPdfFolder == null) return;
-    
+        if (currentPdfFolder == null || pdfFiles == null || pdfFiles.isEmpty()) return;
+        openPdf(pdfFiles.get(currentPdfIndex));
     }
+
     @FXML
     private void onToggleImageOverlay() {
         overlayMode = !overlayMode;
         if (overlayMode) {
+            if (pdfFile1 == null || pdfFile2 == null) {
+                System.out.println("Erreur : pdfFile1 ou pdfFile2 non initialisé");
+                return;
+            }
             try {
                 showImageComparison(pdfFile1, pdfFile2);
                 pdfScrollPane2.setVisible(false);
@@ -412,6 +714,7 @@ public void comparePdfText(File pdfFile1, File pdfFile2) {
             pdfScrollPane2.setManaged(true);
         }
     }
+    
     private void showImageComparison(File pdfFile1, File pdfFile2) throws IOException {
         if (pdfFile1 == null || pdfFile2 == null) {
             LoggerService.log("Un des fichiers PDF est null, impossible de comparer les images.");
@@ -575,6 +878,9 @@ private void loadPdfToContainer(File pdfFile, VBox container) {
     } catch (IOException e) {
         e.printStackTrace();
     }
+
 }
+
+
 
 }

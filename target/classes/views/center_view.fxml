@@ -12,21 +12,18 @@
       spacing="10"
       fx:id="rootCenterView">
 
-    <!-- Barre de boutons -->
+    <!-- Barre de boutons principale (zoom, etc) -->
     <HBox spacing="10" alignment="CENTER" prefHeight="20" minHeight="20" maxHeight="20">
         <padding>
             <Insets top="15" right="10" bottom="5" left="10"/>
         </padding>
         <Button fx:id="zoomInButton" text="➕" onAction="#zoomIn" styleClass="zoom-button"/>
         <Button fx:id="zoomOutButton" text="➖" onAction="#zoomOut" styleClass="zoom-button"/>
-        <Button text="📄1" onAction="#onChangePdfFolderButtonClicked" styleClass="zoom-button"/>
+        <Button text="📄1" onAction="#changePdfFolder" styleClass="zoom-button"/>
         <Button text="📄2" onAction="#onClickedChoicePdfCompare" styleClass="zoom-button"/>
-        
         <Button text="🔍" onAction="#onClickedShowCompare" styleClass="zoom-button"/>
         <Button text="🔀" onAction="#onToggleImageOverlay" styleClass="zoom-button"/>
-
         <Button text="▶" onAction="#onClickedComparePdf" styleClass="zoom-button"/>
-
     </HBox>
 
     <!-- Comparaison : deux scrolls côte à côte -->
@@ -46,5 +43,13 @@
             </content>
         </ScrollPane>
     </HBox>
+
+  <!-- NOUVEAU : barre de navigation PDF sous la vue -->
+    <HBox spacing="20" alignment="CENTER" prefHeight="40" minHeight="40" maxHeight="40" style="-fx-padding: 10 0 10 0;">
+        <Button fx:id="previousPdfButton" onAction="#onPreviousPdfButtonClicked" text="⬅ Précédent"/>
+        <Button fx:id="chooseFolderButton" text="📁 Choisir dossier" onAction="#chooseFolder"/>
+        <Button fx:id="nextPdfButton" onAction="#onNextPdfButtonClicked" text="Suivant ➡" />
+    </HBox>
+
 
 </VBox>

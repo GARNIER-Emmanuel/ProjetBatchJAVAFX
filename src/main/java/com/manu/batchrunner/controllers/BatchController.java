@@ -14,11 +14,16 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import com.manu.batchrunner.utils.LoggerService;
 
 public class BatchController {
+
+    private Preferences prefs = Preferences.userNodeForPackage(BatchController.class);
+    private static final String BATCH_FOLDER_PREF_KEY = "batchFolderPath";
+
 
     @FXML
     private TextField searchField;
@@ -82,12 +87,20 @@ public class BatchController {
     @FXML
     public void initialize() {
 
-       // Dossier par défaut
-        currentBatchFolder = new File("C:\\Users\\manub\\OneDrive\\Desktop\\batches");
-        if (currentBatchFolder.exists() && currentBatchFolder.isDirectory()) {
-            loadBatchesFromFolder();
+        String savedPath = prefs.get(BATCH_FOLDER_PREF_KEY, null);
+        if (savedPath != null) {
+            File savedFolder = new File(savedPath);
+            if (savedFolder.exists() && savedFolder.isDirectory()) {
+                currentBatchFolder = savedFolder;
+                loadBatchesFromFolder();
+            }
+        } else {
+            // Dossier par défaut si pas de prefs enregistrées
+            currentBatchFolder = new File("C:\\Users\\manub\\OneDrive\\Desktop\\batches");
+            if (currentBatchFolder.exists() && currentBatchFolder.isDirectory()) {
+                loadBatchesFromFolder();
+            }
         }
-
         batchTextArea.setEditable(false);
     
         batchListView.setCellFactory(lv -> new ListCell<File>() {
@@ -363,7 +376,7 @@ private void showButtonText() {
         });
     }
 
-     @FXML
+    @FXML
     private void changeBatchFolderButtonClicked() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Sélectionner un dossier contenant des batchs");
@@ -376,6 +389,8 @@ private void showButtonText() {
             if (batchFiles != null) {
                 batchListView.getItems().setAll(batchFiles);
             }
+            // Sauvegarder dans les preferences
+            prefs.put(BATCH_FOLDER_PREF_KEY, selectedDirectory.getAbsolutePath());
         }
     }
 

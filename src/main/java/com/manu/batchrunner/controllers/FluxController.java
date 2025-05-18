@@ -19,11 +19,15 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import com.manu.batchrunner.utils.LoggerService;
 
 public class FluxController {
+
+    private Preferences prefs = Preferences.userNodeForPackage(FluxController.class);
+    private static final String FLUX_FOLDER_PREF_KEY = "fluxFolderPath";
 
     @FXML
     private ListView<File> fluxListView;
@@ -147,11 +151,23 @@ public class FluxController {
             }
         });
         
-        currentFluxFolder = new File("C:\\Users\\manub\\OneDrive\\Desktop\\flux");
-        if (currentFluxFolder.exists() && currentFluxFolder.isDirectory()) {
+        // Chargement du dossier flux depuis les préférences
+        String savedFluxPath = prefs.get(FLUX_FOLDER_PREF_KEY, null);
+        if (savedFluxPath != null) {
+            File savedFolder = new File(savedFluxPath);
+            if (savedFolder.exists() && savedFolder.isDirectory()) {
+                currentFluxFolder = savedFolder;
+                loadFluxFromFolder();
+            } else {
+                // dossier par défaut si le chemin sauvegardé n'existe plus
+                currentFluxFolder = new File("C:\\Users\\manub\\OneDrive\\Desktop\\flux");
+                loadFluxFromFolder();
+            }
+        } else {
+            // pas de prefs, on met le dossier par défaut
+            currentFluxFolder = new File("C:\\Users\\manub\\OneDrive\\Desktop\\flux");
             loadFluxFromFolder();
         }
-
         LoggerService.setLogArea(logTextArea);
         LoggerService.setExecutedList(executedBatchesListView);
 
@@ -345,17 +361,22 @@ public class FluxController {
 
     @FXML
     private void openFluxFolderDialog() {
-    DirectoryChooser directoryChooser = new DirectoryChooser();
-    directoryChooser.setTitle("Sélectionner un dossier contenant des fichiers XML");
-    File selectedDirectory = directoryChooser.showDialog(fluxListView.getScene().getWindow());
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Sélectionner un dossier contenant des fichiers XML");
+        File selectedDirectory = directoryChooser.showDialog(fluxListView.getScene().getWindow());
 
-    if (selectedDirectory != null && selectedDirectory.isDirectory()) {
-        File[] xmlFiles = selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
-        if (xmlFiles != null) {
-            fluxListView.getItems().clear();
-            fluxListView.getItems().addAll(xmlFiles);
+        if (selectedDirectory != null && selectedDirectory.isDirectory()) {
+            currentFluxFolder = selectedDirectory; // Mettre à jour le dossier courant
+
+            File[] xmlFiles = selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
+            if (xmlFiles != null) {
+                fluxListView.getItems().clear();
+                fluxListView.getItems().addAll(xmlFiles);
+            }
+
+            // Sauvegarder dans les préférences
+            prefs.put(FLUX_FOLDER_PREF_KEY, selectedDirectory.getAbsolutePath());
         }
-      }
     }
 
     private void filterFluxList(String filter) {
