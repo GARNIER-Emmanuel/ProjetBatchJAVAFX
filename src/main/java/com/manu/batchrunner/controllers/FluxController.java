@@ -113,6 +113,8 @@ public class FluxController {
 
     @FXML
     private void initialize() {
+
+        
         String cssPath = "/styles/" + currentTheme + "/right_view_style.css";
         URL cssURL = getClass().getResource(cssPath);
         if (cssURL != null) {

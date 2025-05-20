@@ -39,9 +39,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.prefs.Preferences;
 
 public class PdfController implements Initializable {
@@ -100,6 +102,7 @@ public class PdfController implements Initializable {
     
     private double scale1 = 1.0;
     private double scale2 = 1.0;
+    private Map<File, List<Image>> pdfPagesCache = new HashMap<>();
 
     private final double scaleStep = 0.1;
     private final double minScale = 0.3;
@@ -284,7 +287,23 @@ public class PdfController implements Initializable {
             LoggerService.log("PDF 2 chargé : " + secondPdf.getName());
         }
     }
-
+    private List<Image> getPdfPagesImages(File pdfFile) throws IOException {
+        if (pdfPagesCache.containsKey(pdfFile)) {
+            return pdfPagesCache.get(pdfFile);
+        }
+        List<Image> images = new ArrayList<>();
+        try (PDDocument document = PDDocument.load(pdfFile)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            for (int page = 0; page < document.getNumberOfPages(); ++page) {
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 150); // 150 dpi par exemple
+                Image fxImage = SwingFXUtils.toFXImage(bim, null);
+                images.add(fxImage);
+            }
+        }
+        pdfPagesCache.put(pdfFile, images);
+        return images;
+    }
+    
     @FXML
     private void onClickedShowCompare() {
         boolean currentlyVisible = pdfScrollPane2.isVisible();
@@ -863,23 +882,25 @@ private void loadPdfToContainer(File pdfFile, VBox container) {
         LoggerService.log("Fichier PDF non trouvé pour affichage : " + (pdfFile != null ? pdfFile.getPath() : "null"));
         return;
     }
-    try (PDDocument document = PDDocument.load(pdfFile)) {
-        PDFRenderer pdfRenderer = new PDFRenderer(document);
-        container.getChildren().clear();
 
-        for (int page = 0; page < document.getNumberOfPages(); ++page) {
-            BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 150, ImageType.RGB);
-            Image fxImage = SwingFXUtils.toFXImage(bim, null);
+    container.getChildren().clear();
+
+    try {
+        List<Image> images = getPdfPagesImages(pdfFile);
+
+        for (Image fxImage : images) {
             ImageView iv = new ImageView(fxImage);
             iv.setFitWidth(baseWidth * scale1);
             iv.setPreserveRatio(true);
             container.getChildren().add(iv);
         }
+
     } catch (IOException e) {
         e.printStackTrace();
+        LoggerService.log("Erreur lors du chargement du PDF en images : " + e.getMessage());
     }
-
 }
+
 
 
 

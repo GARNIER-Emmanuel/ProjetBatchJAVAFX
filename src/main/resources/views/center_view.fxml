@@ -46,9 +46,9 @@
 
   <!-- NOUVEAU : barre de navigation PDF sous la vue -->
     <HBox spacing="20" alignment="CENTER" prefHeight="40" minHeight="40" maxHeight="40" style="-fx-padding: 10 0 10 0;">
-        <Button fx:id="previousPdfButton" onAction="#onPreviousPdfButtonClicked" text="⬅ Précédent"/>
-        <Button fx:id="chooseFolderButton" text="📁 Choisir dossier" onAction="#chooseFolder"/>
-        <Button fx:id="nextPdfButton" onAction="#onNextPdfButtonClicked" text="Suivant ➡" />
+        <Button fx:id="previousPdfButton" onAction="#onPreviousPdfButtonClicked" text="⬅ Précédent" styleClass="zoom-button"/>
+        <Button fx:id="chooseFolderButton" text="📁 Choisir dossier" onAction="#chooseFolder" styleClass="zoom-button"/>
+        <Button fx:id="nextPdfButton" onAction="#onNextPdfButtonClicked" text="Suivant ➡" styleClass="zoom-button"/>
     </HBox>
 
 
